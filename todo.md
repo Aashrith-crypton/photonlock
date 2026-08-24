@@ -12,3 +12,9 @@
 - [x] Replace smoothing with an explicit threshold/blob/centroid perception stage and a true Kalman state estimator.
 - [x] Add CSV export and verify authenticated experiment-history save/list contracts.
 - [x] Inspect the signed-in history flow in the live preview and the narrow mobile layout in an independent local browser capture before publication.
+- [x] Formalize the offline GRU model-artifact contract and document its GRU-only inference scope.
+- [x] Add predictor selection and measured comparison between kinematic and trained-sequence modes.
+- [x] Generate and download a comprehensive SIH-formatted PDF experiment report from completed benchmark data.
+- [x] Implement a camera/pan-tilt adapter interface with virtual and real-feed modes, connection configuration, command limits, and an emergency-stop control.
+- [x] Add an integration test proving predictive tracking falls back to kinematic extrapolation when trained-model output is unavailable.
+- [x] Re-run final validation and save the delivery checkpoint after closing the model-contract and fallback-test gaps.

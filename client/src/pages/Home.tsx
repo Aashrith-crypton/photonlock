@@ -1,10 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
+import HardwareAdapterPanel from "@/components/HardwareAdapterPanel";
+import HardwareFeed from "@/components/HardwareFeed";
 import SimulationViewport from "@/components/SimulationViewport";
-import { DEFAULT_CONFIG, metricValue, PhotonSimulation, PRESETS, runBenchmark, type BenchmarkResult, type SimulationConfig, type TrackingMode } from "@/lib/simulator";
+import { DEFAULT_HARDWARE_CONFIG, type CameraSource, type HardwareAdapterConfig } from "@/lib/hardwareAdapter";
+import { downloadSihExperimentReport } from "@/lib/pdfReport";
+import { GRU_MODEL_INFO } from "@/lib/sequencePredictor";
+import { DEFAULT_CONFIG, metricValue, PhotonSimulation, PRESETS, runBenchmark, runPredictorComparison, type BenchmarkResult, type PredictorComparison, type SimulationConfig, type TrackingMode } from "@/lib/simulator";
 import { trpc } from "@/lib/trpc";
-import { Activity, Aperture, BarChart3, ChevronRight, CircleHelp, Download, Gauge, History, Layers3, Pause, Play, Radar, RotateCcw, Settings2, Sparkles, Waves } from "lucide-react";
+import { Activity, Aperture, BarChart3, ChevronRight, CircleHelp, Cpu, Download, FileDown, Gauge, History, Layers3, Pause, Play, Radar, RotateCcw, Settings2, Sparkles, Waves } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
@@ -21,6 +26,10 @@ export default function Home() {
   const [running, setRunning] = useState(true);
   const [activePreset, setActivePreset] = useState("normal");
   const [benchmark, setBenchmark] = useState<BenchmarkResult | null>(null);
+  const [predictorBenchmark, setPredictorBenchmark] = useState<PredictorComparison | null>(null);
+  const [cameraSource, setCameraSource] = useState<CameraSource>("virtual");
+  const [hardwareConfig, setHardwareConfig] = useState<HardwareAdapterConfig>(DEFAULT_HARDWARE_CONFIG);
+  const [adapterArmed, setAdapterArmed] = useState(false);
   const engine = useRef(new PhotonSimulation(DEFAULT_CONFIG));
   const [snapshot, setSnapshot] = useState(() => engine.current.getSnapshot());
   const saveRun = trpc.experiment.save.useMutation({
@@ -59,6 +68,7 @@ export default function Home() {
     if (!benchmark) return null;
     return benchmark.classical.meanError - benchmark.predictive.meanError;
   }, [benchmark]);
+  const predictorDelta = useMemo(() => predictorBenchmark ? predictorBenchmark.kinematic.meanError - predictorBenchmark.trainedGru.meanError : null, [predictorBenchmark]);
 
   const updateConfig = <K extends keyof SimulationConfig>(key: K, value: SimulationConfig[K]) => {
     setConfig(previous => ({ ...previous, [key]: value }));
@@ -68,10 +78,11 @@ export default function Home() {
   const applyPreset = (presetId: string) => {
     const preset = PRESETS.find(item => item.id === presetId);
     if (!preset) return;
-    const next = { ...DEFAULT_CONFIG, ...preset.config, seed: config.seed, mode: config.mode };
+    const next = { ...DEFAULT_CONFIG, ...preset.config, seed: config.seed, mode: config.mode, predictor: config.predictor };
     setConfig(next);
     setActivePreset(presetId);
     setBenchmark(null);
+    setPredictorBenchmark(null);
   };
 
   const downloadReport = () => {
@@ -109,6 +120,15 @@ export default function Home() {
     URL.revokeObjectURL(url);
   };
 
+  const downloadSihPdf = async () => {
+    if (!benchmark) {
+      toast.message("Run a benchmark comparison before generating the SIH report.");
+      return;
+    }
+    await downloadSihExperimentReport({ configuration: config, snapshot, benchmark, predictorComparison: predictorBenchmark });
+    toast.success("SIH PDF report prepared for download.");
+  };
+
   const saveBenchmark = () => {
     if (!benchmark) return;
     if (!isAuthenticated) {
@@ -136,6 +156,7 @@ export default function Home() {
           <a className="nav-item nav-item-active" href="#laboratory"><Radar className="h-4 w-4" /> Live laboratory</a>
           <a className="nav-item" href="#benchmark"><BarChart3 className="h-4 w-4" /> Benchmark suite</a>
           <a className="nav-item" href="#telemetry"><Activity className="h-4 w-4" /> Telemetry</a>
+          <button className="nav-item w-full text-left" type="button" onClick={downloadSihPdf}><FileDown className="h-4 w-4" /> Download SIH PDF</button>
           <button className="nav-item w-full text-left" type="button" onClick={downloadReport}><Download className="h-4 w-4" /> Export JSON report</button>
           <button className="nav-item w-full text-left" type="button" onClick={downloadCsv}><Download className="h-4 w-4" /> Export CSV metrics</button>
         </nav>
@@ -153,6 +174,7 @@ export default function Home() {
             <div className="hidden items-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-300/[.06] px-3 py-2 sm:flex"><span className="pulse-live h-1.5 w-1.5 rounded-full bg-emerald-300" /><span className="mono text-[10px] tracking-[.1em] text-emerald-100">{running ? "SIMULATION LIVE" : "SIMULATION PAUSED"}</span></div>
             <Button variant="outline" onClick={downloadCsv} className="hidden border-white/10 bg-white/[.035] text-slate-200 hover:bg-white/10 md:inline-flex"><Download className="mr-2 h-4 w-4" /> CSV</Button>
             <Button variant="outline" onClick={downloadReport} className="hidden border-white/10 bg-white/[.035] text-slate-200 hover:bg-white/10 sm:inline-flex"><Download className="mr-2 h-4 w-4" /> JSON</Button>
+            <Button variant="outline" onClick={downloadSihPdf} className="hidden border-violet-200/20 bg-violet-300/[.07] text-violet-100 hover:bg-violet-300/[.14] xl:inline-flex"><FileDown className="mr-2 h-4 w-4" /> SIH PDF</Button>
             <Button onClick={() => setRunning(value => !value)} className="bg-cyan-300 font-semibold text-slate-950 hover:bg-cyan-200"><>{running ? <Pause className="mr-2 h-4 w-4" /> : <Play className="mr-2 h-4 w-4" />}{running ? "Pause" : "Resume"}</></Button>
           </div>
         </header>
@@ -164,7 +186,7 @@ export default function Home() {
                 <div className="flex items-center gap-2"><span className={`h-2 w-2 rounded-full ${snapshot.state === "locked" ? "bg-emerald-300" : snapshot.state === "lost" ? "bg-rose-300" : "bg-amber-300"}`} /><span className="mono text-[10px] font-medium uppercase tracking-[.14em] text-slate-300">State: {snapshot.state.replace("_", " ")}</span></div>
                 <div className="flex items-center gap-2 text-[10px] text-slate-400"><span className="mono">T+ {snapshot.time.toFixed(1)}s</span><span className="h-3 w-px bg-white/15" /><span className="mono">SEED {config.seed}</span></div>
               </div>
-              <SimulationViewport snapshot={snapshot} config={config} running={running} />
+              {cameraSource === "virtual" ? <SimulationViewport snapshot={snapshot} config={config} running={running} /> : <HardwareFeed config={hardwareConfig} armed={adapterArmed} />}
               <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 <Metric label="Tracking error" value={`${snapshot.metrics.meanError.toFixed(2)} px`} accent="cyan" />
                 <Metric label="Lock retention" value={`${snapshot.metrics.lockRetention.toFixed(1)}%`} accent="emerald" />
@@ -177,7 +199,7 @@ export default function Home() {
               <div className="mb-5 flex flex-wrap items-end justify-between gap-3"><div><p className="mono text-[10px] tracking-[.15em] text-slate-500">MEASURED TELEMETRY</p><h2 className="mt-1 text-base font-bold text-slate-100">Pointing and prediction residuals</h2></div><div className="flex items-center gap-3 text-[10px] text-slate-400"><span className="flex items-center gap-1.5"><i className="legend-dot bg-cyan-300" /> CONTROL ERROR</span><span className="flex items-center gap-1.5"><i className="legend-dot bg-violet-400" /> PREDICTION</span></div></div>
               <div className="h-48 sm:h-56">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={snapshot.history}><defs><linearGradient id="errorFill" x1="0" x2="0" y1="0" y2="1"><stop offset="5%" stopColor="#67e8f9" stopOpacity={0.3}/><stop offset="95%" stopColor="#67e8f9" stopOpacity={0}/></linearGradient><linearGradient id="predictionFill" x1="0" x2="0" y1="0" y2="1"><stop offset="5%" stopColor="#c084fc" stopOpacity={0.22}/><stop offset="95%" stopColor="#c084fc" stopOpacity={0}/></linearGradient></defs><CartesianGrid vertical={false} stroke="rgba(148,163,184,.12)" /><XAxis dataKey="time" hide /><YAxis tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} width={28}/><Tooltip contentStyle={{ background: "#0d1c2c", border: "1px solid rgba(125,211,252,.2)", borderRadius: 12 }} labelFormatter={(value) => `T+ ${Number(value).toFixed(1)}s`} /><Area type="monotone" dataKey="error" name="Control error" stroke="#67e8f9" strokeWidth={2} fill="url(#errorFill)" /><Area type="monotone" dataKey="predictionError" name="Prediction residual" stroke="#c084fc" strokeWidth={1.6} fill="url(#predictionFill)" /></AreaChart>
+                  <AreaChart data={snapshot.history}><defs><linearGradient id="errorFill" x1="0" x2="0" y1="0" y2="1"><stop offset="5%" stopColor="#67e8f9" stopOpacity={0.3}/><stop offset="95%" stopColor="#67e8f9" stopOpacity={0}/></linearGradient><linearGradient id="predictionFill" x1="0" x2="0" y1="0" y2="1"><stop offset="5%" stopColor="#c084fc" stopOpacity={0.22}/><stop offset="95%" stopColor="#c084fc" stopOpacity={0}/></linearGradient></defs><CartesianGrid vertical={false} stroke="rgba(148,163,184,.12)" /><XAxis dataKey="time" hide /><YAxis tick={{ fill: "#64748b", fontSize: 10 }} axisLine={false} tickLine={false} width={28}/><Tooltip contentStyle={{ background: "#0d1c2c", border: "1px solid rgba(125,211,252,.2)", borderRadius: 12 }} labelFormatter={(value) => `T+ ${Number(value).toFixed(1)}s`} formatter={(value: number) => `${value.toFixed(2)} px`} /><Area type="monotone" dataKey="error" name="Control error" stroke="#67e8f9" strokeWidth={2} fill="url(#errorFill)" /><Area type="monotone" dataKey="predictionError" name="Prediction residual" stroke="#c084fc" strokeWidth={1.6} fill="url(#predictionFill)" /></AreaChart>
                 </ResponsiveContainer>
               </div>
             </section>
@@ -186,6 +208,7 @@ export default function Home() {
           <aside className="glass-panel rounded-[1.55rem] border border-cyan-100/10 p-4 sm:p-5">
             <div className="mb-5 flex items-center justify-between"><div><p className="mono text-[10px] tracking-[.15em] text-slate-500">SCENE CONTROLS</p><h2 className="mt-1 text-base font-bold text-slate-100">Experiment configuration</h2></div><Settings2 className="h-4 w-4 text-cyan-200/60" /></div>
             <div className="mb-5 rounded-xl border border-white/8 bg-black/10 p-1.5"><div className="grid grid-cols-2 gap-1"><ModeButton active={trackingMode === "classical"} onClick={() => updateConfig("mode", "classical")} label="Classical" /><ModeButton active={trackingMode === "predictive"} onClick={() => updateConfig("mode", "predictive")} label="Predictive" /></div></div>
+            <div className="mb-5"><p className="control-label"><span>Predictor model</span><span>{config.predictor === "gru" ? "TRAINED GRU" : "KINEMATIC"}</span></p><div className="mt-2 grid grid-cols-2 gap-1 rounded-xl border border-white/8 bg-black/10 p-1.5"><ModeButton active={config.predictor === "kinematic"} onClick={() => updateConfig("predictor", "kinematic")} label="Kinematic" /><ModeButton active={config.predictor === "gru"} onClick={() => updateConfig("predictor", "gru")} label="Trained GRU" /></div><p className="mt-2 text-[10px] leading-4 text-slate-500">{GRU_MODEL_INFO.architecture} · {GRU_MODEL_INFO.sequenceLength} filtered samples · offline artifact {GRU_MODEL_INFO.id}</p></div>
             <div className="space-y-4">
               <SliderControl label="Target speed" value={config.targetSpeed} min={0.4} max={2} step={0.05} unit="×" onChange={value => updateConfig("targetSpeed", value)} />
               <SliderControl label="Visual noise" value={config.noise} min={0} max={1} step={0.02} unit="" onChange={value => updateConfig("noise", value)} />
@@ -206,9 +229,12 @@ export default function Home() {
           <div className="glass-panel rounded-[1.55rem] border border-cyan-100/10 p-4 sm:p-5"><div className="flex items-center gap-3"><Gauge className="h-4 w-4 text-violet-300" /><div><p className="mono text-[10px] tracking-[.15em] text-slate-500">CAMERA COMMAND</p><h2 className="mt-0.5 text-base font-bold text-slate-100">Control telemetry</h2></div></div><div className="mt-5 grid grid-cols-2 gap-3"><Telemetry label="Pan angle" value={`${snapshot.camera.pan.toFixed(2)}°`} /><Telemetry label="Tilt angle" value={`${snapshot.camera.tilt.toFixed(2)}°`} /><Telemetry label="Detections" value={snapshot.metrics.detections.toString()} /><Telemetry label="FPS" value={snapshot.metrics.fps.toFixed(1)} /></div></div>
         </section>
 
+        <section className="mt-5"><HardwareAdapterPanel source={cameraSource} onSourceChange={setCameraSource} onConfigChange={setHardwareConfig} onArmedChange={setAdapterArmed} /></section>
+
         <section id="benchmark" className="mt-5 glass-panel rounded-[1.55rem] border border-cyan-100/10 p-4 sm:p-5">
-          <div className="flex flex-wrap items-end justify-between gap-4"><div><p className="mono text-[10px] tracking-[.15em] text-slate-500">REPRODUCIBLE BENCHMARK</p><h2 className="mt-1 text-lg font-bold text-slate-100">Classical reactive vs. latency-aware predictive</h2><p className="mt-1 max-w-2xl text-xs leading-5 text-slate-400">Both modes execute against the exact same deterministic trajectory, disturbance profile, seed, and simulation duration. Reported values are calculated from the completed runs.</p></div><Button onClick={() => setBenchmark(runBenchmark(config))} className="bg-violet-300 font-semibold text-slate-950 hover:bg-violet-200"><BarChart3 className="mr-2 h-4 w-4" /> Run comparison</Button></div>
+          <div className="flex flex-wrap items-end justify-between gap-4"><div><p className="mono text-[10px] tracking-[.15em] text-slate-500">REPRODUCIBLE BENCHMARK</p><h2 className="mt-1 text-lg font-bold text-slate-100">Classical reactive vs. latency-aware predictive</h2><p className="mt-1 max-w-2xl text-xs leading-5 text-slate-400">Both modes execute against the exact same deterministic trajectory, disturbance profile, seed, and simulation duration. Reported values are calculated from the completed runs.</p></div><Button onClick={() => { setBenchmark(runBenchmark(config)); setPredictorBenchmark(runPredictorComparison(config)); }} className="bg-violet-300 font-semibold text-slate-950 hover:bg-violet-200"><BarChart3 className="mr-2 h-4 w-4" /> Run comparison</Button></div>
           {benchmark ? <><div className="mt-6 overflow-hidden rounded-2xl border border-white/[.08]"><div className="grid grid-cols-[minmax(130px,1.2fr)_1fr_1fr] bg-white/[.035] px-4 py-3 text-[10px] font-semibold uppercase tracking-[.12em] text-slate-500"><span>Measured metric</span><span>Classical</span><span>Predictive</span></div><BenchmarkRow label="Mean tracking error" classical={`${metricValue(benchmark.classical.meanError, 2)} px`} predictive={`${metricValue(benchmark.predictive.meanError, 2)} px`} positive={benchmarkDelta !== null && benchmarkDelta > 0}/><BenchmarkRow label="Lock retention" classical={`${metricValue(benchmark.classical.lockRetention, 1)}%`} predictive={`${metricValue(benchmark.predictive.lockRetention, 1)}%`} /><BenchmarkRow label="Acquisition time" classical={`${metricValue(benchmark.classical.acquisitionTime, 2)} s`} predictive={`${metricValue(benchmark.predictive.acquisitionTime, 2)} s`} /><BenchmarkRow label="Loss count" classical={benchmark.classical.lossCount.toString()} predictive={benchmark.predictive.lossCount.toString()} /><BenchmarkRow label="Reacquisition time" classical={`${metricValue(benchmark.classical.reacquisitionTime, 2)} s`} predictive={`${metricValue(benchmark.predictive.reacquisitionTime, 2)} s`} /><BenchmarkRow label="Measured latency" classical={`${metricValue(benchmark.classical.endToEndLatency, 0)} ms`} predictive={`${metricValue(benchmark.predictive.endToEndLatency, 0)} ms`} /></div><div className="mt-4 flex justify-end"><Button variant="outline" className="border-white/10 bg-white/[.035] text-slate-200 hover:bg-white/10" onClick={saveBenchmark} disabled={saveRun.isPending}><History className="mr-2 h-3.5 w-3.5" /> {saveRun.isPending ? "Saving…" : isAuthenticated ? "Save to experiment history" : "Sign in to save run"}</Button></div></> : <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-white/[.02] px-5 py-8 text-center"><Waves className="mx-auto h-5 w-5 text-cyan-200/50" /><p className="mt-3 text-sm font-semibold text-slate-300">No benchmark completed for this configuration</p><p className="mt-1 text-xs text-slate-500">Run the comparison to record a reproducible, side-by-side evaluation.</p></div>}
+          {predictorBenchmark ? <div className="mt-4 rounded-2xl border border-cyan-200/10 bg-cyan-300/[.035] p-4"><div className="flex flex-wrap items-center justify-between gap-2"><div><p className="mono text-[10px] tracking-[.13em] text-cyan-100/60">PREDICTOR ABLATION</p><p className="mt-1 text-xs font-semibold text-slate-200">Kinematic extrapolation vs. offline trained GRU</p></div><span className={`mono rounded-full px-2.5 py-1 text-[10px] ${predictorDelta !== null && predictorDelta > 0 ? "bg-emerald-300/12 text-emerald-200" : "bg-slate-300/10 text-slate-300"}`}>{predictorDelta !== null ? `${Math.abs(predictorDelta).toFixed(2)} px ${predictorDelta > 0 ? "lower with GRU" : "difference"}` : "MEASURED"}</span></div><div className="mt-3 grid grid-cols-2 gap-3"><Telemetry label="Kinematic mean error" value={`${predictorBenchmark.kinematic.meanError.toFixed(2)} px`} /><Telemetry label="Trained GRU mean error" value={`${predictorBenchmark.trainedGru.meanError.toFixed(2)} px`} /></div></div> : null}
         </section>
         <section className="mt-5 glass-panel rounded-[1.55rem] border border-cyan-100/10 p-4 sm:p-5">
           <div className="flex items-center justify-between"><div><p className="mono text-[10px] tracking-[.15em] text-slate-500">EXPERIMENT HISTORY</p><h2 className="mt-1 text-base font-bold text-slate-100">Saved reproducible runs</h2></div><History className="h-4 w-4 text-cyan-200/60" /></div>

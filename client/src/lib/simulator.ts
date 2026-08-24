@@ -1,3 +1,5 @@
+import { TrainedGruPredictor, type PredictorKind, type SequencePredictor } from "./sequencePredictor";
+
 export type TrackingMode = "classical" | "predictive";
 export type TrackingState = "search" | "acquiring" | "locked" | "lost" | "reacquiring";
 export type TrajectoryKind = "linear" | "accelerating" | "circular" | "uav";
@@ -15,6 +17,7 @@ export type SimulationConfig = {
   latencyMs: number;
   occlusionStart: number;
   occlusionDuration: number;
+  predictor: PredictorKind;
 };
 
 export type BeaconPosition = {
@@ -61,6 +64,13 @@ export type BenchmarkResult = {
   config: SimulationConfig;
 };
 
+export type PredictorComparison = {
+  kinematic: TrackingMetrics;
+  trainedGru: TrackingMetrics;
+  generatedAt: string;
+  config: SimulationConfig;
+};
+
 export const DEFAULT_CONFIG: SimulationConfig = {
   seed: 240816,
   mode: "predictive",
@@ -74,6 +84,7 @@ export const DEFAULT_CONFIG: SimulationConfig = {
   latencyMs: 85,
   occlusionStart: 11,
   occlusionDuration: 0,
+  predictor: "gru",
 };
 
 export const PRESETS: Array<{
@@ -216,6 +227,7 @@ export class PhotonSimulation {
   private filtered: Point | null = null;
   private velocity: Point = { x: 0, y: 0 };
   private kalman = new Kalman2D();
+  private sequencePredictor: SequencePredictor;
   private prediction: Point | null = null;
   private state: TrackingState = "search";
   private pending: Observation[] = [];
@@ -236,8 +248,9 @@ export class PhotonSimulation {
   private confidence = 0;
   private history: SimulationSnapshot["history"] = [];
 
-  constructor(private config: SimulationConfig) {
+  constructor(private config: SimulationConfig, predictor?: SequencePredictor) {
     this.random = new SeededRandom(config.seed);
+    this.sequencePredictor = predictor ?? new TrainedGruPredictor();
   }
 
   private trajectory(id: number, time: number): Point {
@@ -366,10 +379,12 @@ export class PhotonSimulation {
     const estimate = this.kalman.update({ x: observation.x, y: observation.y }, dt, measurementVariance);
     this.filtered = estimate.position;
     this.velocity = estimate.velocity;
+    this.sequencePredictor.push({ x: estimate.position.x, y: estimate.position.y, vx: estimate.velocity.x, vy: estimate.velocity.y });
     const lookAhead = this.config.mode === "predictive" ? this.config.latencyMs / 1000 + 0.085 : 0;
+    const modelDelta = this.config.mode === "predictive" && this.config.predictor === "gru" ? this.sequencePredictor.predictDelta(lookAhead) : null;
     this.prediction = {
-      x: clamp(estimate.position.x + this.velocity.x * lookAhead),
-      y: clamp(estimate.position.y + this.velocity.y * lookAhead),
+      x: clamp(estimate.position.x + (modelDelta?.x ?? this.velocity.x * lookAhead)),
+      y: clamp(estimate.position.y + (modelDelta?.y ?? this.velocity.y * lookAhead)),
     };
   }
 
@@ -489,6 +504,17 @@ export function runBenchmark(config: SimulationConfig): BenchmarkResult {
     generatedAt: new Date().toISOString(),
     config,
   };
+}
+
+export function runPredictorComparison(config: SimulationConfig): PredictorComparison {
+  const simulate = (predictor: PredictorKind) => {
+    const engine = new PhotonSimulation({ ...config, mode: "predictive", predictor });
+    const step = 1 / 30;
+    const frames = Math.round(config.durationSec / step);
+    for (let frame = 0; frame < frames; frame += 1) engine.step(step);
+    return engine.getSnapshot().metrics;
+  };
+  return { kinematic: simulate("kinematic"), trainedGru: simulate("gru"), generatedAt: new Date().toISOString(), config };
 }
 
 export function metricValue(value: number | null, digits = 1) {
