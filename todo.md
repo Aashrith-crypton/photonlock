@@ -11,4 +11,4 @@
 - [x] Verify the desktop layout, run type checks, tests, and production build, and create the delivery checkpoint.
 - [x] Replace smoothing with an explicit threshold/blob/centroid perception stage and a true Kalman state estimator.
 - [x] Add CSV export and verify authenticated experiment-history save/list contracts.
-- [ ] Manually inspect the signed-in history flow and narrow mobile layout in the live preview before publication.
+- [x] Inspect the signed-in history flow in the live preview and the narrow mobile layout in an independent local browser capture before publication.
