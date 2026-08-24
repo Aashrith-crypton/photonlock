@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -25,4 +25,17 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+/** A reproducible simulation or benchmark record belonging to one researcher. */
+export const experimentRuns = mysqlTable("experimentRuns", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  label: varchar("label", { length: 120 }).notNull(),
+  seed: int("seed").notNull(),
+  trackerMode: mysqlEnum("trackerMode", ["classical", "predictive", "benchmark"]).notNull(),
+  configuration: json("configuration").$type<Record<string, unknown>>().notNull(),
+  results: json("results").$type<Record<string, unknown>>().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ExperimentRun = typeof experimentRuns.$inferSelect;
+export type InsertExperimentRun = typeof experimentRuns.$inferInsert;

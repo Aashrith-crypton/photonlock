@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { experimentRuns, InsertExperimentRun, InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,14 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function listExperimentRuns(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(experimentRuns).where(eq(experimentRuns.userId, userId)).orderBy(desc(experimentRuns.createdAt)).limit(20);
+}
+
+export async function createExperimentRun(run: InsertExperimentRun) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable; the experiment could not be persisted.");
+  await db.insert(experimentRuns).values(run);
+}
