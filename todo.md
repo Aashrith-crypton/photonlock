@@ -30,4 +30,4 @@
 - [x] Verify desktop, tablet, and compact layouts; preserve all simulation, benchmark, export, and hardware-adapter functionality.
 - [x] Review the shared Google Slides template and create a template-aligned Cortex Clash PhotonLock presentation with project-relevant imagery.
 - [x] Generate detailed SIH judge-pitch speaker notes for all six Cortex Clash PhotonLock slides.
-- [ ] Add the Cortex Clash presentation source files to the GitHub repository and verify the expanded export.
+- [x] Add the Cortex Clash presentation source files to the GitHub repository and verify the expanded export.
