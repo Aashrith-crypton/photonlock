@@ -1,0 +1,27 @@
+<slide id="idea">
+  <background color="canvas"/>
+  <shape id="footer-navy" type="rect" x="0" y="672" width="1280" height="48" fill="navy"/>
+  <shape id="footer-teal" type="rect" x="0" y="668" width="1280" height="4" fill="teal"/>
+  <text id="slide-number" x="72" y="42" width="100" height="24" font="caption" size="13" color="teal" wrap="false">02 / IDEA TITLE</text>
+  <text id="sih-mark" x="980" y="42" width="230" height="24" font="caption" size="13" color="muted" align="right" wrap="false">SIH 2026 · IDEA SUBMISSION</text>
+  <shape id="top-rule" type="line" x="72" y="78" width="1138" height="0" stroke="hairline"/>
+  <text id="headline" x="72" y="112" width="610" height="84" font="heading" size="38" color="navy" line-height="1.08">PhotonLock makes optical acquisition observable, predictable, and reviewable.</text>
+  <text id="summary" x="72" y="239" width="610" height="56" font="body" size="20" color="muted" line-height="1.35">A virtual pointing, acquisition, and tracking laboratory for testing fragile mobile FSOC alignment before field deployment.</text>
+  <shape id="capability-card-one" type="rect" x="72" y="312" width="610" height="74" fill="cream"/>
+  <icon id="capability-icon-one" name="target" x="94" y="331" width="30" height="30" color="amber"/>
+  <text id="capability-one" x="142" y="326" width="508" height="42" font="body" size="18" color="navy"><strong>Configurable disturbance space</strong><span color="muted"> · motion, visual noise, vibration, distortion, latency, and loss</span></text>
+  <shape id="capability-card-two" type="rect" x="72" y="400" width="610" height="74" fill="#EAF4F3"/>
+  <icon id="capability-icon-two" name="radar" x="94" y="419" width="30" height="30" color="teal"/>
+  <text id="capability-two" x="142" y="414" width="508" height="42" font="body" size="18" color="navy"><strong>Transparent tracking states</strong><span color="muted"> · search, acquisition, lock, loss, and recovery</span></text>
+  <shape id="capability-card-three" type="rect" x="72" y="488" width="610" height="74" fill="#FFF2E8"/>
+  <icon id="capability-icon-three" name="clipboard-check" x="94" y="507" width="30" height="30" color="amber"/>
+  <text id="capability-three" x="142" y="502" width="508" height="42" font="body" size="18" color="navy"><strong>Repeatable evidence</strong><span color="muted"> · seeded scenarios, measured benchmarks, and exportable reports</span></text>
+  <shape id="visual-frame" type="rect" x="760" y="170" width="448" height="340" fill="cream"/>
+  <image id="beacon-tracking-image" x="778" y="188" width="412" height="304" src="/home/ubuntu/cortex_clash_deck/assets/beacon_tracking.webp" fit="cover"/>
+  <shape id="visual-overlay" type="rect" x="778" y="188" width="412" height="304" fill="#1C2D421A"/>
+  <shape id="target-box" type="rect" x="937" y="271" width="104" height="82" fill="none" stroke="amber" stroke-width="3"/>
+  <text id="target-box-label" x="943" y="247" width="150" height="20" font="caption" size="13" color="amber" wrap="false">DESIGNATED BEACON</text>
+  <text id="visual-caption" x="760" y="534" width="448" height="40" font="caption" size="13" color="muted">SIMULATED EVENT / TARGET-DETECTION CONTEXT</text>
+  <text id="footer-left" x="72" y="687" width="360" height="20" font="caption" size="12" color="#FCFBF8" wrap="false">CORTEX CLASH · PHOTONLOCK</text>
+  <text id="footer-right" x="890" y="687" width="320" height="20" font="caption" size="12" color="#FCFBF8" align="right" wrap="false">02 / 06</text>
+</slide>

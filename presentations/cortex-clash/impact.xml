@@ -1,0 +1,28 @@
+<slide id="impact">
+  <background color="canvas"/>
+  <shape id="footer-navy" type="rect" x="0" y="672" width="1280" height="48" fill="navy"/>
+  <shape id="footer-teal" type="rect" x="0" y="668" width="1280" height="4" fill="teal"/>
+  <text id="slide-number" x="72" y="42" width="190" height="24" font="caption" size="13" color="teal" wrap="false">05 / IMPACT &amp; BENEFITS</text>
+  <text id="sih-mark" x="980" y="42" width="230" height="24" font="caption" size="13" color="muted" align="right" wrap="false">SIH 2026 · IDEA SUBMISSION</text>
+  <shape id="top-rule" type="line" x="72" y="78" width="1138" height="0" stroke="hairline"/>
+  <text id="headline" x="72" y="112" width="920" height="48" font="heading" size="38" color="navy">The value is a faster path from algorithm idea to operational confidence.</text>
+  <text id="summary" x="76.8" y="211.5" width="820" height="54" font="body" size="19" color="muted" line-height="1.32">PhotonLock turns a difficult alignment question into a visible, replayable experiment—with the caveat that simulator results remain distinct from physical-terminal validation.</text>
+  <shape id="impact-line" type="line" x="72" y="275.9" width="1080" height="0" stroke="hairline"/>
+  <shape id="field-card" type="rect" x="72" y="288" width="344" height="278" fill="cream"/>
+  <icon id="field-icon" name="binoculars" x="98" y="316" width="42" height="42" color="amber"/>
+  <text id="field-kicker" x="98" y="380" width="220" height="20" font="caption" size="13" color="amber">01 / FIELD TEAMS</text>
+  <text id="field-title" x="98" y="412" width="274" height="34" font="body" size="23" color="navy"><strong>See loss before deployment</strong></text>
+  <text id="field-body" x="98" y="466" width="274" height="62" font="body" size="17" color="muted" line-height="1.32">Inspect lock loss, recovery behavior, and camera-command residuals before connecting the physical terminal.</text>
+  <shape id="research-card" type="rect" x="468" y="288" width="344" height="278" fill="#EAF4F3"/>
+  <icon id="research-icon" name="flask-conical" x="494" y="316" width="42" height="42" color="teal"/>
+  <text id="research-kicker" x="494" y="380" width="220" height="20" font="caption" size="13" color="teal">02 / RESEARCHERS</text>
+  <text id="research-title" x="494" y="412" width="274" height="34" font="body" size="23" color="navy"><strong>Compare under one seed</strong></text>
+  <text id="research-body" x="494" y="466" width="274" height="62" font="body" size="17" color="muted" line-height="1.32">Review tracking error, acquisition, loss count, lock retention, FPS, latency, and prediction residuals under matched conditions.</text>
+  <shape id="integrator-card" type="rect" x="864" y="288" width="344" height="278" fill="#FFF2E8"/>
+  <icon id="integrator-icon" name="file-output" x="890" y="316" width="42" height="42" color="amber"/>
+  <text id="integrator-kicker" x="890" y="380" width="220" height="20" font="caption" size="13" color="amber">03 / INTEGRATORS</text>
+  <text id="integrator-title" x="890" y="412" width="274" height="34" font="body" size="23" color="navy"><strong>Export credible evidence</strong></text>
+  <text id="integrator-body" x="890" y="466" width="274" height="62" font="body" size="17" color="muted" line-height="1.32">Preserve experiment history and export JSON, CSV, and SIH-ready PDF reports from completed virtual benchmark runs.</text>
+  <text id="footer-left" x="72" y="687" width="360" height="20" font="caption" size="12" color="#FCFBF8" wrap="false">CORTEX CLASH · PHOTONLOCK</text>
+  <text id="footer-right" x="890" y="687" width="320" height="20" font="caption" size="12" color="#FCFBF8" align="right" wrap="false">05 / 06</text>
+</slide>

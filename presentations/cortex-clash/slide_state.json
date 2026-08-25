@@ -1,0 +1,78 @@
+{
+  "project_info": {
+    "title": "Title Page",
+    "created": 1787669118.028,
+    "last_updated": 1787669298.144,
+    "total_slides": 6
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "idea",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "technical",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "feasibility",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "impact",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "research",
+      "state": "edited",
+      "pageNum": 6
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "Title Page",
+      "summary": "PhotonLock title, Cortex Clash team identity, and SIH-ready cover metadata.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "idea",
+      "title": "Idea Title",
+      "summary": "The PhotonLock proposed solution and its distinctive virtual FSOC experimentation value.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "technical",
+      "title": "Technical Approach",
+      "summary": "Classical perception, Kalman tracking, trained GRU prediction, state machine, and safe hardware boundary.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "feasibility",
+      "title": "Feasibility and Viability",
+      "summary": "Deterministic digital test range, reproducible scenarios, measured comparisons, and prototype path.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "impact",
+      "title": "Impact and Benefits",
+      "summary": "Benefits for field teams, researchers, and integrators, with transparent experiment evidence.",
+      "image_plan": "Use a suitable image if needed"
+    },
+    {
+      "id": "research",
+      "title": "Research and References",
+      "summary": "Research grounding, credible simulator disclosure, and next demo pathway.",
+      "image_plan": "Use a suitable image if needed"
+    }
+  ]
+}

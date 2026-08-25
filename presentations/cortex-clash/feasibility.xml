@@ -1,0 +1,30 @@
+<slide id="feasibility">
+  <background color="canvas"/>
+  <shape id="footer-navy" type="rect" x="0" y="672" width="1280" height="48" fill="navy"/>
+  <shape id="footer-teal" type="rect" x="0" y="668" width="1280" height="4" fill="teal"/>
+  <text id="slide-number" x="72" y="42" width="220" height="24" font="caption" size="13" color="teal" wrap="false">04 / FEASIBILITY &amp; VIABILITY</text>
+  <text id="sih-mark" x="980" y="42" width="230" height="24" font="caption" size="13" color="muted" align="right" wrap="false">SIH 2026 · IDEA SUBMISSION</text>
+  <shape id="top-rule" type="line" x="72" y="78" width="1138" height="0" stroke="hairline" stroke-width="1"/>
+  <text id="headline" x="72" y="112" width="800" height="82" font="heading" size="38" color="navy" line-height="1.08">A deterministic digital test range compresses the field-test cycle.</text>
+  <text id="summary" x="72" y="212" width="780" height="54" font="body" size="19" color="muted" line-height="1.32">PhotonLock is feasible as a software-first prototype because its virtual scene, controller comparison, reports, and hardware adapter can evolve independently while sharing the same experiment contract.</text>
+  <shape id="architecture-frame" type="rect" x="950" y="108" width="258" height="146" fill="cream"/>
+  <image id="architecture-image" src="/home/ubuntu/cortex_clash_deck/assets/pat_beacon_architecture.png" x="962" y="120" width="234" height="106" fit="contain"/>
+  <text id="architecture-caption" x="962" y="230" width="234" height="18" font="caption" size="11" color="muted" align="center">BEACON / PAT RESEARCH CONTEXT</text>
+  <shape id="card-one" type="rect" x="72" y="320" width="328" height="252" fill="cream"/>
+  <icon id="card-one-icon" name="repeat-2" x="96" y="348" width="38" height="38" color="teal"/>
+  <text id="card-one-title" x="96" y="410" width="256" height="28" font="body" size="22" color="navy"><strong>Repeatable setup</strong></text>
+  <text id="card-one-body" x="96" y="454" width="256" height="78" font="body" size="17" color="muted" line-height="1.32">Fixed seeds preserve trajectory, disturbance profile, latency, and duration so a result can be replayed and reviewed.</text>
+  <shape id="card-one-rule" type="rect" x="96" y="548" width="84" height="4" fill="teal"/>
+  <shape id="card-two" type="rect" x="448" y="320" width="328" height="252" fill="#EAF4F3"/>
+  <icon id="card-two-icon" name="layers-3" x="472" y="348" width="38" height="38" color="teal"/>
+  <text id="card-two-title" x="472" y="410" width="256" height="28" font="body" size="22" color="navy"><strong>Implemented scenarios</strong></text>
+  <text id="card-two-body" x="472" y="454" width="256" height="78" font="body" size="17" color="muted" line-height="1.32">Nominal, acceleration, vibration, turbulence, latency, multiple targets, forced loss, and combined disturbance are available now.</text>
+  <shape id="card-two-rule" type="rect" x="472" y="548" width="84" height="4" fill="teal"/>
+  <shape id="card-three" type="rect" x="824" y="320" width="328" height="252" fill="#FFF2E8"/>
+  <icon id="card-three-icon" name="shield-check" x="848" y="348" width="38" height="38" color="amber"/>
+  <text id="card-three-title" x="848" y="410" width="256" height="28" font="body" size="22" color="navy"><strong>Controlled transition</strong></text>
+  <text id="card-three-body" x="848" y="454" width="256" height="78" font="body" size="17" color="muted" line-height="1.32">A safety-gated adapter keeps virtual camera evaluation separate from a future authenticated, bounded hardware bridge.</text>
+  <shape id="card-three-rule" type="rect" x="848" y="548" width="84" height="4" fill="amber"/>
+  <text id="footer-left" x="72" y="687" width="360" height="20" font="caption" size="12" color="#FCFBF8" wrap="false">CORTEX CLASH · PHOTONLOCK</text>
+  <text id="footer-right" x="890" y="687" width="320" height="20" font="caption" size="12" color="#FCFBF8" align="right" wrap="false">04 / 06</text>
+</slide>

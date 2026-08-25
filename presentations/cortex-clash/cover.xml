@@ -1,0 +1,22 @@
+<slide id="cover">
+  <background color="canvas"/>
+  <shape id="footer-navy" type="rect" x="0" y="672" width="1280" height="48" fill="navy"/>
+  <shape id="footer-teal" type="rect" x="0" y="668" width="1280" height="4" fill="teal"/>
+  <text id="sih-mark" x="980" y="42" width="230" height="34" font="caption" size="13" color="muted" align="right" wrap="false">SMART INDIA HACKATHON 2026</text>
+  <shape id="sih-mark-line" type="line" x="1048" y="80" width="162" height="0" stroke="teal" stroke-width="2"/>
+  <text id="cover-kicker" x="72" y="116" width="460" height="28" font="caption" size="14" color="teal" wrap="false">PHYSICS-AWARE OPTICAL TRACKING</text>
+  <text id="cover-title" x="72" y="158" width="620" height="126" font="display" size="64" color="navy" line-height="1.0">PhotonLock</text>
+  <text id="cover-subtitle" x="72" y="286" width="600" height="94" font="heading" size="30" color="navy" line-height="1.15">Predictive optical-beacon tracking for mobile FSOC terminals</text>
+  <shape id="cover-title-rule" type="rect" x="72" y="404" width="104" height="7" fill="amber"/>
+  <text id="cover-team" x="72" y="438" width="460" height="32" font="body" size="21" color="navy"><strong>Cortex Clash</strong> · Smart India Hackathon 2026</text>
+  <text id="cover-meta" x="72" y="482" width="540" height="48" font="caption" size="14" color="muted">Problem Statement ID / Team ID: To be confirmed from the SIH portal</text>
+  <shape id="image-frame" type="rect" x="758" y="170" width="454" height="352" fill="cream"/>
+  <image id="space-link-image" src="/home/ubuntu/cortex_clash_deck/assets/space_laser_link.jpg" x="776" y="188" width="418" height="316" fit="cover"/>
+  <shape id="image-overlay" type="rect" x="776" y="188" width="418" height="316" fill="#1C2D4214"/>
+  <shape id="beam-line-one" type="line" x="530" y="368" width="292" height="-88" stroke="amber" stroke-width="4" arrow-end="arrow"/>
+  <shape id="beam-line-two" type="line" x="544" y="387" width="275" height="-45" stroke="teal" stroke-width="2" stroke-dash="dash"/>
+  <icon id="beacon-icon" name="radio" x="730" y="276" width="56" height="56" color="amber"/>
+  <text id="image-caption" x="778" y="538" width="414" height="30" font="caption" size="13" color="muted">OPTICAL LINK CONTEXT · PREDICTIVE ACQUISITION</text>
+  <text id="footer-left" x="72" y="687" width="360" height="20" font="caption" size="12" color="#FCFBF8" wrap="false">CORTEX CLASH · IDEA SUBMISSION</text>
+  <text id="footer-right" x="890" y="687" width="320" height="20" font="caption" size="12" color="#FCFBF8" align="right" wrap="false">PHOTONLOCK / VIRTUAL PAT LAB</text>
+</slide>

@@ -1,0 +1,28 @@
+<slide id="research">
+  <background color="canvas"/>
+  <shape id="footer-navy" type="rect" x="0" y="672" width="1280" height="48" fill="navy"/>
+  <shape id="footer-teal" type="rect" x="0" y="668" width="1280" height="4" fill="teal"/>
+  <text id="slide-number" x="72" y="42" width="230" height="24" font="caption" size="13" color="teal" wrap="false">06 / RESEARCH &amp; REFERENCES</text>
+  <text id="sih-mark" x="980" y="42" width="230" height="24" font="caption" size="13" color="muted" align="right" wrap="false">SIH 2026 · IDEA SUBMISSION</text>
+  <shape id="top-rule" type="line" x="72" y="78" width="1138" height="0" stroke="hairline"/>
+  <text id="headline" x="72" y="112" width="920" height="48" font="heading" size="38" color="navy">Built for credible experimentation, not decorative simulation.</text>
+  <text id="summary" x="72" y="201.9" width="880" height="32" font="body" size="19" color="muted">PhotonLock reports simulator-derived measurements and identifies its offline GRU path explicitly; physical-terminal claims require future field validation.</text>
+  <shape id="disclosure-panel" type="rect" x="72" y="252" width="352" height="214" fill="cream"/>
+  <icon id="disclosure-icon" name="shield-check" x="98" y="282" width="40" height="40" color="teal"/>
+  <text id="disclosure-label" x="98" y="344" width="250" height="20" font="caption" size="13" color="teal">RESEARCH POSTURE</text>
+  <text id="disclosure-title" x="98" y="376" width="274" height="30" font="body" size="22" color="navy"><strong>Transparent by design</strong></text>
+  <text id="disclosure-body" x="98" y="420" width="280" height="34" font="caption" size="14" color="muted">Every benchmark is tied to a seed, scenario, configuration, and completed run.</text>
+  <shape id="sources-panel" type="rect" x="456" y="252" width="752" height="214" fill="#EAF4F3"/>
+  <text id="sources-label" x="482" y="278" width="300" height="20" font="caption" size="13" color="teal">REFERENCE ANCHORS</text>
+  <text id="source-one" x="482" y="314" width="680" height="28" font="body" size="16" color="navy"><strong>01</strong> · NASA laser-communications and space-to-ground optical-link materials</text>
+  <shape id="source-one-line" type="line" x="482" y="350" width="676" height="0" stroke="hairline"/>
+  <text id="source-two" x="482" y="364" width="680" height="28" font="body" size="16" color="navy"><strong>02</strong> · MIT Lincoln Laboratory reporting on high-rate space laser communications</text>
+  <shape id="source-two-line" type="line" x="482" y="400" width="676" height="0" stroke="hairline"/>
+  <text id="source-three" x="482" y="414" width="680" height="28" font="body" size="16" color="navy"><strong>03</strong> · Literature on laser beacon tracking for FSOC small-satellite platforms</text>
+  <shape id="demo-panel" type="rect" x="72" y="510" width="1136" height="102" fill="#FFF2E8"/>
+  <icon id="demo-icon" name="play-circle" x="98" y="538" width="42" height="42" color="amber"/>
+  <text id="demo-label" x="164" y="530" width="250" height="20" font="caption" size="13" color="amber">NEXT DEMONSTRATION</text>
+  <text id="demo-title" x="164" y="558" width="850" height="28" font="body" size="21" color="navy"><strong>Run combined disturbance → compare controllers → save evidence → export SIH PDF.</strong></text>
+  <text id="footer-left" x="72" y="687" width="360" height="20" font="caption" size="12" color="#FCFBF8" wrap="false">CORTEX CLASH · PHOTONLOCK</text>
+  <text id="footer-right" x="890" y="687" width="320" height="20" font="caption" size="12" color="#FCFBF8" align="right" wrap="false">06 / 06</text>
+</slide>

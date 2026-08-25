@@ -1,0 +1,14 @@
+<design>
+  <size width="1280" height="720"></size>
+  <color name="canvas" value="#FCFBF8"/>
+  <color name="navy" value="#1C2D42"/>
+  <color name="teal" value="#2B7A78"/>
+  <color name="amber" value="#D97736"/>
+  <color name="cream" value="#F4F1EA"/>
+  <color name="muted" value="#64748B"/>
+  <color name="hairline" value="#E2E8F0"/>
+  <font name="display" family="Inter" size="48"/>
+  <font name="heading" family="Inter" size="32"/>
+  <font name="body" family="Inter" size="18"/>
+  <font name="caption" family="Inter" size="14"/>
+</design>

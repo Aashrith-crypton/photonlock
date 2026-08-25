@@ -1,0 +1,45 @@
+<slide id="technical">
+  <background color="canvas"/>
+  <shape id="footer-navy" type="rect" x="0" y="672" width="1280" height="48" fill="navy"/>
+  <shape id="footer-teal" type="rect" x="0" y="668" width="1280" height="4" fill="teal"/>
+  <text id="slide-number" x="72" y="42" width="180" height="24" font="caption" size="13" color="teal" wrap="false">03 / TECHNICAL APPROACH</text>
+  <text id="sih-mark" x="980" y="42" width="230" height="24" font="caption" size="13" color="muted" align="right" wrap="false">SIH 2026 · IDEA SUBMISSION</text>
+  <shape id="top-rule" type="line" x="72" y="78" width="1138" height="0" stroke="hairline"/>
+  <text id="headline" x="72" y="112" width="860" height="48" font="heading" size="38" color="navy">A perception-to-control stack anticipates delay before it becomes lock loss.</text>
+  <text id="method-note" x="72" y="215" width="820" height="32" font="body" size="19" color="muted">The prototype keeps classical vision as a measured baseline and adds predictive state estimation only where it improves the configured virtual experiment.</text>
+  <shape id="node-one" type="rect" x="72" y="266" width="184" height="150" fill="cream"/>
+  <icon id="node-one-icon" name="radio" x="94" y="286" width="38" height="38" color="amber"/>
+  <text id="node-one-title" x="94" y="338" width="140" height="24" font="body" size="19" color="navy"><strong>Optical beacon</strong></text>
+  <text id="node-one-body" x="94" y="371" width="140" height="32" font="caption" size="13" color="muted">Configurable target trajectory and occlusion</text>
+  <shape id="connector-one" type="line" x="256" y="341" width="38" height="0" stroke="teal" stroke-width="3" arrow-end="arrow"/>
+  <shape id="node-two" type="rect" x="294" y="266" width="184" height="150" fill="#EAF4F3"/>
+  <icon id="node-two-icon" name="scan-line" x="316" y="286" width="38" height="38" color="teal"/>
+  <text id="node-two-title" x="316" y="338" width="145" height="24" font="body" size="19" color="navy"><strong>Perception</strong></text>
+  <text id="node-two-body" x="316" y="371" width="145" height="32" font="caption" size="13" color="muted">Threshold → blob → centroid detection</text>
+  <shape id="connector-two" type="line" x="478" y="341" width="38" height="0" stroke="teal" stroke-width="3" arrow-end="arrow"/>
+  <shape id="node-three" type="rect" x="516" y="266" width="184" height="150" fill="cream"/>
+  <icon id="node-three-icon" name="activity" x="538" y="286" width="38" height="38" color="teal"/>
+  <text id="node-three-title" x="538" y="338" width="145" height="24" font="body" size="19" color="navy"><strong>State estimate</strong></text>
+  <text id="node-three-body" x="538" y="371" width="145" height="32" font="caption" size="13" color="muted">Continuous Kalman-assisted tracking</text>
+  <shape id="connector-three" type="line" x="700" y="341" width="38" height="0" stroke="amber" stroke-width="3" arrow-end="arrow"/>
+  <shape id="node-four" type="rect" x="738" y="266" width="184" height="150" fill="#FFF2E8"/>
+  <icon id="node-four-icon" name="brain-circuit" x="760" y="286" width="38" height="38" color="amber"/>
+  <text id="node-four-title" x="760" y="338" width="145" height="24" font="body" size="19" color="navy"><strong>Prediction</strong></text>
+  <text id="node-four-body" x="760" y="371" width="145" height="32" font="caption" size="13" color="muted">Offline GRU over the configured delay horizon</text>
+  <shape id="connector-four" type="line" x="922" y="341" width="38" height="0" stroke="amber" stroke-width="3" arrow-end="arrow"/>
+  <shape id="node-five" type="rect" x="960" y="266" width="184" height="150" fill="#F0F3F8"/>
+  <icon id="node-five-icon" name="axis-3d" x="982" y="286" width="38" height="38" color="navy"/>
+  <text id="node-five-title" x="982" y="338" width="145" height="24" font="body" size="19" color="navy"><strong>Pan / tilt</strong></text>
+  <text id="node-five-body" x="982" y="371" width="145" height="32" font="caption" size="13" color="muted">Stable virtual camera control with limits</text>
+  <shape id="foundation-one" type="rect" x="72" y="476" width="340" height="118" fill="cream"/>
+  <text id="foundation-one-label" x="94" y="496" width="260" height="20" font="caption" size="13" color="teal">TRACKING STATES</text>
+  <text id="foundation-one-body" x="94" y="526" width="290" height="44" font="body" size="17" color="navy">Search → Acquiring → Locked → Lost → Reacquiring</text>
+  <shape id="foundation-two" type="rect" x="434" y="476" width="340" height="118" fill="#EAF4F3"/>
+  <text id="foundation-two-label" x="456" y="496" width="260" height="20" font="caption" size="13" color="teal">MEASURED OUTPUTS</text>
+  <text id="foundation-two-body" x="456" y="526" width="290" height="44" font="body" size="17" color="navy">Error · retention · acquisition · loss · recovery · latency</text>
+  <shape id="foundation-three" type="rect" x="796" y="476" width="348" height="118" fill="#FFF2E8"/>
+  <text id="foundation-three-label" x="818" y="496" width="270" height="20" font="caption" size="13" color="amber">HARDWARE BOUNDARY</text>
+  <text id="foundation-three-body" x="818" y="526" width="298" height="44" font="body" size="17" color="navy">Safety-gated virtual-to-hardware adapter; no automatic device commands</text>
+  <text id="footer-left" x="72" y="687" width="360" height="20" font="caption" size="12" color="#FCFBF8" wrap="false">CORTEX CLASH · PHOTONLOCK</text>
+  <text id="footer-right" x="890" y="687" width="320" height="20" font="caption" size="12" color="#FCFBF8" align="right" wrap="false">03 / 06</text>
+</slide>
