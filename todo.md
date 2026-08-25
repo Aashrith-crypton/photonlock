@@ -33,5 +33,6 @@
 - [x] Add the Cortex Clash presentation source files to the GitHub repository and verify the expanded export.
 - [ ] Write a comprehensive SIH judge-facing README with project overview, local setup, validation, and demo guidance.
 - [ ] Add a GitHub Actions workflow that runs type checking, tests, and production build on pushes and pull requests.
+- [ ] Fix the initial CI run by installing pnpm before dependency caching and validation steps.
 - [ ] Change the PhotonLock GitHub repository visibility from private to public after explicit confirmation and verify public access.
 - [ ] Add the MIT license text referenced by the judge-facing README before public release.
