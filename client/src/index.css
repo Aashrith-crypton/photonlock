@@ -89,20 +89,61 @@
   body {
     @apply bg-background text-foreground;
     font-family: "Manrope", sans-serif;
-    background-image: radial-gradient(circle at 12% 3%, rgba(34, 211, 238, 0.09), transparent 24rem), radial-gradient(circle at 88% 12%, rgba(168, 85, 247, 0.08), transparent 28rem);
+    background-image: radial-gradient(circle at 16% 0%, rgba(34, 211, 238, 0.07), transparent 28rem), linear-gradient(rgba(101, 163, 205, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(101, 163, 205, .025) 1px, transparent 1px);
+    background-size: auto, 48px 48px, 48px 48px;
   }
   button:not(:disabled), [role="button"]:not([aria-disabled="true"]), [type="button"]:not(:disabled), [type="submit"]:not(:disabled), [type="reset"]:not(:disabled), a[href], select:not(:disabled), input[type="checkbox"]:not(:disabled), input[type="radio"]:not(:disabled) { @apply cursor-pointer; }
 }
 
 @layer components {
   .mono { font-family: "DM Mono", monospace; }
-  .lab-shell { min-height: 100vh; background: linear-gradient(135deg, rgba(7, 17, 31, .91), rgba(9, 21, 35, .96)); }
-  .glass-panel { background: linear-gradient(145deg, rgba(24, 44, 62, .86), rgba(14, 28, 43, .87)); box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 18px 55px rgba(0,0,0,.12); }
-  .nav-item { @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-400 transition-all duration-200 hover:bg-white/5 hover:text-slate-100; }
+  .lab-shell { min-height: 100vh; background: rgba(5, 14, 25, .84); }
+  .mission-nav { background: rgba(5, 16, 28, .74); }
+  .mission-content { min-width: 0; flex: 1; padding: 1.25rem; }
+  .glass-panel, .technical-panel { background: rgba(10, 27, 44, .78); box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 15px 35px rgba(0,0,0,.13); }
+  .nav-item { @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-400 transition-all duration-200 hover:bg-cyan-300/[.06] hover:text-slate-100; }
   .nav-item-active { @apply bg-cyan-400/10 text-cyan-100 ring-1 ring-inset ring-cyan-300/20; }
   .control-label { @apply flex items-center justify-between text-[10px] font-medium uppercase tracking-[.12em] text-slate-400; font-family: "DM Mono", monospace; }
   .legend-dot { @apply block h-1.5 w-1.5 rounded-full; }
+  .eyebrow { @apply text-[10px] font-medium tracking-[.16em] text-cyan-100/55; font-family: "DM Mono", monospace; }
+  .status-chip { @apply inline-flex items-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-300/[.06] px-3 py-2 text-[10px] tracking-[.1em] text-emerald-100; font-family: "DM Mono", monospace; }
+  .mission-button { @apply inline-flex items-center gap-2 rounded-md bg-cyan-300 px-4 py-2.5 text-sm font-bold text-slate-950 transition-transform duration-150 hover:bg-cyan-200 active:scale-[.98]; }
+  .mission-button-secondary { @apply inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/[.025] px-4 py-2.5 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/[.08]; }
+  .overview-hero { @apply relative mt-5 overflow-hidden rounded-xl border border-cyan-100/10 px-6 py-12 sm:px-10 sm:py-16; background: radial-gradient(circle at 75% 52%, rgba(34,211,238,.14), transparent 18rem), rgba(7,22,37,.78); min-height: 500px; }
+  .overview-hero h1 { @apply mt-3 text-4xl font-extrabold tracking-[.18em] text-slate-50 sm:text-6xl; }
+  .overview-hero h2 { @apply mt-4 max-w-2xl text-xl font-semibold leading-tight text-slate-200 sm:text-3xl; }
+  .hero-copy { @apply mt-5 max-w-xl text-sm leading-7 text-slate-400 sm:text-base; }
+  .optical-hero { @apply absolute right-0 top-0 hidden h-full w-[48%] lg:block; }
+  .optical-orbit { position:absolute; border:1px solid rgba(103,232,249,.22); border-radius:999px; transform:rotate(-30deg); }
+  .orbit-a { width:330px; height:150px; right:12%; top:31%; }
+  .orbit-b { width:250px; height:250px; right:20%; top:23%; border-color:rgba(192,132,252,.18); }
+  .optical-beacon { position:absolute; width:16px; height:16px; border-radius:999px; background:#fef3c7; box-shadow:0 0 0 10px rgba(251,191,36,.12),0 0 32px rgba(251,191,36,.78); right:30%; top:41%; animation: beaconDrift 4.5s ease-in-out infinite; }
+  .optical-camera { position:absolute; right:60%; top:58%; display:grid; place-items:center; width:56px; height:56px; border:1px solid rgba(103,232,249,.55); color:rgb(103 232 249); background:rgba(6,16,28,.65); }
+  .optical-beam { position:absolute; height:1px; width:230px; right:30%; top:51%; transform:rotate(147deg); transform-origin:right; background:linear-gradient(90deg,transparent,rgba(103,232,249,.85),rgba(251,191,36,.9)); }
+  .hero-label { position:absolute; font:10px "DM Mono", monospace; color:rgba(226,232,240,.62); letter-spacing:.1em; }
+  .label-beacon { right:17%; top:34%; }.label-camera { right:62%; top:69%; }
+  .spec-strip { @apply mt-5 grid border border-cyan-100/10 sm:grid-cols-2 lg:grid-cols-4; }
+  .spec-cell { @apply flex min-h-20 flex-col justify-center gap-2 border-b border-cyan-100/10 px-5 py-4 text-xs font-semibold tracking-[.08em] text-slate-300 sm:border-r sm:last:border-r-0 lg:border-b-0; }
+  .overview-grid { @apply mt-5 grid gap-5 lg:grid-cols-2; }
+  .technical-panel { @apply rounded-xl border border-cyan-100/10 p-5; }
+  .technical-panel h3 { @apply mt-3 text-xl font-bold text-slate-100; }.technical-panel p:not(.eyebrow) { @apply mt-3 text-sm leading-6 text-slate-400; }
+  .page-header { @apply flex flex-wrap items-end justify-between gap-5 border-b border-white/[.08] pb-6; }.page-header h1 { @apply mt-2 max-w-3xl text-3xl font-bold tracking-tight text-slate-100; }.page-header p:not(.eyebrow) { @apply mt-3 max-w-2xl text-sm leading-6 text-slate-400; }
+  .performance-config { @apply mt-5 grid gap-5 lg:grid-cols-[.4fr_1fr]; }.performance-config h2 { @apply mt-1 text-lg font-bold text-slate-100; }
+  .scenario-tabs { @apply grid gap-1 sm:grid-cols-2 xl:grid-cols-4; }.scenario-tabs button { @apply flex items-center gap-2 border border-white/[.08] bg-black/10 px-3 py-2 text-left text-xs text-slate-400 hover:border-cyan-200/25 hover:text-slate-100; }.scenario-tabs .scenario-active { @apply border-cyan-200/40 bg-cyan-300/[.1] text-cyan-100; }
+  .scientific-table { @apply mt-5 overflow-hidden border border-white/[.08]; }.scientific-table > div { @apply grid grid-cols-[1.2fr_1fr_1fr] border-b border-white/[.06] px-4 py-3 text-xs; }.scientific-table .head { @apply bg-white/[.035] text-[10px] tracking-[.12em] text-slate-500; font-family: "DM Mono", monospace; }.scientific-table strong { @apply font-medium text-cyan-100; font-family: "DM Mono", monospace; }.scientific-table span { @apply text-slate-400; }
+  .metric-stack { @apply mt-5 grid gap-3; }.metric-stack div { @apply border-l-2 border-violet-300/60 bg-black/10 px-4 py-3; }.metric-stack span { @apply block text-[10px] text-slate-500; }.metric-stack strong { @apply mt-1 block text-xl text-slate-100; }
+  .empty-instrument { @apply mt-5 grid place-items-center border border-dashed border-cyan-100/15 bg-slate-950/25 px-6 py-16 text-center; }.empty-instrument h2 { @apply mt-2 text-xl font-bold text-slate-200; }.empty-instrument p:not(.eyebrow) { @apply mt-2 max-w-md text-sm leading-6 text-slate-500; }
+  .technical-doc { @apply mt-5 grid gap-5 lg:grid-cols-[1.2fr_.8fr]; }.technical-doc > article:first-child { @apply border-l-2 border-cyan-300/75 py-2 pl-5; }.technical-doc h2 { @apply mt-2 text-2xl font-bold text-slate-100; }.technical-doc p:not(.eyebrow) { @apply mt-4 max-w-3xl text-sm leading-7 text-slate-400; }
+  .pipeline { @apply mt-5 grid gap-2; }.pipeline > div { @apply flex items-center gap-3 text-xs font-semibold text-slate-300; }.pipeline > div svg:last-child { @apply ml-auto; }
+  .experiment-row { @apply grid grid-cols-[1.2fr_.65fr_.8fr] border-t border-white/[.06] px-5 py-4 text-xs; }.experiment-row strong { @apply text-slate-100; }.experiment-row p { @apply mt-2 max-w-md text-[11px] leading-5 text-slate-500; }.experiment-row span { @apply block text-slate-300; font-family: "DM Mono", monospace; }.experiment-row small { @apply mt-1 block text-[10px] text-slate-500; }
+  .state-readout { @apply flex items-center gap-2; }.state-readout span:first-child { box-shadow: 0 0 0 4px currentColor; }.state-cyan { @apply text-cyan-200; }.state-cyan span:first-child { @apply bg-cyan-300; }.state-emerald { @apply text-emerald-200; }.state-emerald span:first-child { @apply bg-emerald-300; }.state-amber { @apply text-amber-200; }.state-amber span:first-child { @apply bg-amber-300; }.state-rose { @apply text-rose-200; }.state-rose span:first-child { @apply bg-rose-300; }
+  .state-console { @apply flex flex-wrap items-center justify-between gap-4 border-l-2 border-cyan-300/70 bg-cyan-300/[.035] px-4 py-3; }.state-console-alert { @apply border-rose-300/70 bg-rose-300/[.055]; }
+  .stress-console { @apply grid gap-5 rounded-xl border border-amber-200/15 bg-amber-300/[.025] p-5 lg:grid-cols-[.85fr_auto]; }.stress-console h2 { @apply mt-2 text-lg font-bold text-slate-100; }.stress-console p:not(.eyebrow) { @apply mt-2 max-w-2xl text-xs leading-5 text-slate-400; }.stress-actions { @apply flex items-start gap-2; }.stress-timeline { @apply grid gap-px border border-white/[.08] bg-white/[.08] sm:col-span-2 sm:grid-cols-2 xl:grid-cols-6; }.stress-timeline > div { @apply min-h-24 bg-[#091827] px-3 py-3; }.stress-timeline span { @apply block text-[10px] text-slate-500; }.stress-timeline strong { @apply mt-2 block text-[11px] text-slate-300; }.stress-timeline small { @apply mt-1 block text-[10px] leading-4 text-slate-500; }.stress-timeline .stress-current { @apply bg-amber-300/10; }.stress-timeline .stress-current strong { @apply text-amber-100; }.stress-timeline .stress-complete { @apply bg-emerald-300/[.06]; }.stress-timeline .stress-complete strong { @apply text-emerald-100; }
 }
 
 @media (prefers-reduced-motion: no-preference) { .pulse-live { animation: livePulse 1.8s ease-in-out infinite; } }
 @keyframes livePulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+@keyframes beaconDrift { 0%,100% { transform:translate3d(-10px,-6px,0); } 50% { transform:translate3d(16px,12px,0); } }
+
+@media (min-width: 640px) { .mission-content { padding: 1.5rem; } }
+@media (min-width: 1024px) { .mission-content { padding: 1.75rem 2rem; } }

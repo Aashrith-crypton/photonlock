@@ -70,6 +70,23 @@ export default function SimulationViewport({ snapshot, config, running }: Props)
     ctx.strokeStyle = "rgba(86, 212, 255, 0.46)";
     ctx.strokeRect(centre.x - 37, centre.y - 37, 74, 74);
 
+    const drawPath = (points: Array<{ x: number; y: number }>, color: string, dashed = false) => {
+      if (points.length < 2) return;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = dashed ? 1.15 : 1.7;
+      ctx.setLineDash(dashed ? [5, 5] : []);
+      ctx.beginPath();
+      points.forEach((entry, index) => {
+        const pathPoint = point(entry.x, entry.y);
+        if (index === 0) ctx.moveTo(pathPoint.x, pathPoint.y);
+        else ctx.lineTo(pathPoint.x, pathPoint.y);
+      });
+      ctx.stroke();
+      ctx.setLineDash([]);
+    };
+    drawPath(snapshot.history.map(item => ({ x: item.targetScreenX, y: item.targetScreenY })), "rgba(251, 191, 36, .6)");
+    drawPath(snapshot.history.filter(item => item.predictionScreenX !== null && item.predictionScreenY !== null).map(item => ({ x: item.predictionScreenX!, y: item.predictionScreenY! })), "rgba(192, 132, 252, .7)", true);
+
     snapshot.beacons.forEach(beacon => {
       if (!beacon.visible) return;
       const visualX = beacon.screenX + config.turbulence * 0.012 * Math.sin(time * 4.2 + beacon.id);
@@ -91,6 +108,11 @@ export default function SimulationViewport({ snapshot, config, running }: Props)
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
       if (primary) {
+        ctx.strokeStyle = `rgba(251, 191, 36, ${0.26 + snapshot.confidence * 0.54})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(x, y, 21 + snapshot.confidence * 9, 0, Math.PI * 2);
+        ctx.stroke();
         ctx.strokeStyle = "rgba(251, 191, 36, .86)";
         ctx.lineWidth = 1.2;
         ctx.strokeRect(x - 15, y - 15, 30, 30);
@@ -119,6 +141,31 @@ export default function SimulationViewport({ snapshot, config, running }: Props)
       ctx.setLineDash([]);
     }
 
+    const primary = snapshot.beacons.find(beacon => beacon.id === 0);
+    if (primary?.visible) {
+      const start = point(primary.screenX, primary.screenY);
+      const velocityScale = 38;
+      ctx.strokeStyle = "rgba(251, 191, 36, .82)";
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(start.x, start.y);
+      ctx.lineTo(start.x + snapshot.targetVelocity.x * velocityScale, start.y + snapshot.targetVelocity.y * velocityScale);
+      ctx.stroke();
+    }
+
+    if (snapshot.state === "search" || snapshot.state === "reacquiring" || snapshot.state === "lost") {
+      const latest = snapshot.history.at(-1);
+      const origin = latest ? point(latest.targetScreenX, latest.targetScreenY) : centre;
+      const phase = snapshot.time * (snapshot.state === "lost" ? 1.2 : 2.2);
+      ctx.strokeStyle = snapshot.state === "lost" ? "rgba(251, 113, 133, .72)" : "rgba(103, 232, 249, .6)";
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([4, 5]);
+      ctx.beginPath();
+      ctx.arc(origin.x, origin.y, 28 + 15 * (0.5 + 0.5 * Math.sin(phase)), phase, phase + Math.PI * 1.45);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
     if (config.turbulence > 0.05) {
       ctx.strokeStyle = `rgba(147, 197, 253, ${config.turbulence * 0.18})`;
       ctx.lineWidth = 1;
@@ -134,21 +181,29 @@ export default function SimulationViewport({ snapshot, config, running }: Props)
     }
 
     ctx.fillStyle = "rgba(3, 9, 18, .78)";
-    ctx.fillRect(14, 14, 181, 48);
+    ctx.fillRect(14, 14, 208, 48);
     ctx.fillStyle = "rgba(226, 232, 240, .86)";
     ctx.font = "11px 'DM Mono', monospace";
     ctx.fillText(`VIRTUAL CAMERA // ${running ? "LIVE" : "PAUSED"}`, 25, 34);
     ctx.fillStyle = snapshot.isOccluded ? "#fda4af" : "#86efac";
     ctx.fillText(snapshot.isOccluded ? "PRIMARY BEACON OCCLUDED" : "PRIMARY BEACON DESIGNATED", 25, 51);
+
+    ctx.fillStyle = "rgba(3, 9, 18, .72)";
+    ctx.fillRect(width - 192, 14, 178, 48);
+    ctx.fillStyle = "rgba(226, 232, 240, .86)";
+    ctx.fillText(`PREDICTION // ${snapshot.prediction ? "ACTIVE" : "AWAITING FILTER"}`, width - 181, 34);
+    ctx.fillStyle = "rgba(192, 132, 252, .92)";
+    ctx.fillText(`HORIZON ${(config.latencyMs / 1000 + 0.085).toFixed(2)} S`, width - 181, 51);
   }, [snapshot, config, running]);
 
   return (
     <div className="simulation-viewport relative overflow-hidden rounded-[1.35rem] border border-cyan-100/10 bg-[#06101b] shadow-2xl shadow-cyan-950/20">
       <canvas ref={canvasRef} aria-label="Live virtual optical beacon tracking scene" />
-      <div className="pointer-events-none absolute bottom-4 left-4 flex gap-4 text-[10px] font-medium tracking-[0.13em] text-slate-300/80">
+      <div className="pointer-events-none absolute bottom-4 left-4 flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-medium tracking-[0.13em] text-slate-300/80">
         <span className="flex items-center gap-1.5"><i className="legend-dot bg-amber-300" /> BEACON</span>
         <span className="flex items-center gap-1.5"><i className="legend-dot bg-teal-300" /> FILTER</span>
         <span className="flex items-center gap-1.5"><i className="legend-dot bg-violet-400" /> PREDICTION</span>
+        <span className="flex items-center gap-1.5"><i className="legend-dot bg-slate-200" /> LOCK ZONE</span>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
+import MissionNav, { MobileMissionNav } from "@/components/MissionNav";
 import HardwareAdapterPanel from "@/components/HardwareAdapterPanel";
 import HardwareFeed from "@/components/HardwareFeed";
 import SimulationViewport from "@/components/SimulationViewport";
@@ -9,10 +10,27 @@ import { downloadSihExperimentReport } from "@/lib/pdfReport";
 import { GRU_MODEL_INFO } from "@/lib/sequencePredictor";
 import { DEFAULT_CONFIG, metricValue, PhotonSimulation, PRESETS, runBenchmark, runPredictorComparison, type BenchmarkResult, type PredictorComparison, type SimulationConfig, type TrackingMode } from "@/lib/simulator";
 import { trpc } from "@/lib/trpc";
-import { Activity, Aperture, BarChart3, ChevronRight, CircleHelp, Cpu, Download, FileDown, Gauge, History, Layers3, Pause, Play, Radar, RotateCcw, Settings2, Sparkles, Waves } from "lucide-react";
+import { Activity, Aperture, BarChart3, ChevronRight, CircleHelp, Cpu, Download, FileDown, Gauge, History, Layers3, Pause, Play, Radar, RotateCcw, Settings2, Target, TimerReset, TriangleAlert, Waves, Zap } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
+
+const STRESS_PROTOCOL: Array<{ label: string; note: string; config: Partial<SimulationConfig> }> = [
+  { label: "PHASE 01 · NOMINAL", note: "Low-noise baseline acquisition", config: { ...PRESETS.find(item => item.id === "normal")?.config } },
+  { label: "PHASE 02 · TARGET MOTION", note: "Increase designated-beacon velocity", config: { trajectory: "uav", targetSpeed: 1.35, noise: 0.06, vibration: 0.07, turbulence: 0.06, latencyMs: 70, occlusionDuration: 0 } },
+  { label: "PHASE 03 · PLATFORM VIBRATION", note: "Introduce supported camera-base vibration", config: { vibration: 0.7, turbulence: 0.1, latencyMs: 85 } },
+  { label: "PHASE 04 · SENSOR NOISE", note: "Increase simulated visual noise", config: { noise: 0.28, vibration: 0.42, turbulence: 0.16 } },
+  { label: "PHASE 05 · LATENCY", note: "Apply high end-to-end perception delay", config: { latencyMs: 310, targetSpeed: 1.45 } },
+  { label: "PHASE 06 · TARGET LOSS", note: "Run configured occlusion and real reacquisition state", config: { occlusionStart: 3, occlusionDuration: 3.3, latencyMs: 170 } },
+];
+
+const STATE_COPY: Record<string, { label: string; detail: string; tone: "cyan" | "emerald" | "amber" | "rose" }> = {
+  search: { label: "SEARCH", detail: "Scanning around the virtual lock zone", tone: "cyan" },
+  acquiring: { label: "ACQUIRING", detail: "Validating consecutive centroid detections", tone: "amber" },
+  locked: { label: "LOCKED", detail: "Camera control is following the selected reference", tone: "emerald" },
+  lost: { label: "TARGET LOST", detail: "Last-known position retained; loss detection active", tone: "rose" },
+  reacquiring: { label: "REACQUIRING", detail: "Searching the last-known uncertainty region", tone: "cyan" },
+};
 
 /**
  * All content in this page are only for example, replace with your own feature implementation
@@ -30,6 +48,7 @@ export default function Home() {
   const [cameraSource, setCameraSource] = useState<CameraSource>("virtual");
   const [hardwareConfig, setHardwareConfig] = useState<HardwareAdapterConfig>(DEFAULT_HARDWARE_CONFIG);
   const [adapterArmed, setAdapterArmed] = useState(false);
+  const [stressPhase, setStressPhase] = useState<number | null>(null);
   const engine = useRef(new PhotonSimulation(DEFAULT_CONFIG));
   const [snapshot, setSnapshot] = useState(() => engine.current.getSnapshot());
   const saveRun = trpc.experiment.save.useMutation({
@@ -63,6 +82,15 @@ export default function Home() {
     return () => cancelAnimationFrame(frame);
   }, [running, config]);
 
+  useEffect(() => {
+    if (stressPhase === null || stressPhase >= STRESS_PROTOCOL.length) return;
+    const phase = STRESS_PROTOCOL[stressPhase];
+    setConfig(previous => ({ ...DEFAULT_CONFIG, ...previous, ...phase.config, mode: previous.mode, predictor: previous.predictor, seed: previous.seed }));
+    setActivePreset("stress");
+    const timer = window.setTimeout(() => setStressPhase(step => step === null ? null : step + 1), 4200);
+    return () => window.clearTimeout(timer);
+  }, [stressPhase]);
+
   const trackingMode = config.mode;
   const benchmarkDelta = useMemo(() => {
     if (!benchmark) return null;
@@ -74,6 +102,8 @@ export default function Home() {
     setConfig(previous => ({ ...previous, [key]: value }));
     setActivePreset("custom");
   };
+
+  const resetDisturbances = () => setConfig(previous => ({ ...previous, noise: DEFAULT_CONFIG.noise, vibration: DEFAULT_CONFIG.vibration, turbulence: DEFAULT_CONFIG.turbulence, latencyMs: DEFAULT_CONFIG.latencyMs, occlusionDuration: 0 }));
 
   const applyPreset = (presetId: string) => {
     const preset = PRESETS.find(item => item.id === presetId);
@@ -145,28 +175,16 @@ export default function Home() {
     });
   };
 
+  const stateInfo = STATE_COPY[snapshot.state];
+  const target = snapshot.beacons.find(beacon => beacon.id === 0);
+  const targetVelocity = Math.hypot(snapshot.targetVelocity.x, snapshot.targetVelocity.y);
+
   return (
     <div className="lab-shell lg:flex">
-      <aside className="hidden min-h-screen w-[236px] flex-col border-r border-cyan-100/10 bg-[#091724]/70 px-4 py-5 lg:flex">
-        <div className="mb-9 flex items-center gap-3 px-2">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-cyan-300 to-blue-500 shadow-lg shadow-cyan-950/70"><Aperture className="h-5 w-5 text-[#06101a]" /></div>
-          <div><p className="text-sm font-extrabold tracking-[.16em] text-slate-50">PHOTONLOCK</p><p className="mono mt-0.5 text-[9px] tracking-[.16em] text-cyan-200/55">FSOC LABORATORY</p></div>
-        </div>
-        <nav className="space-y-1">
-          <a className="nav-item nav-item-active" href="#laboratory"><Radar className="h-4 w-4" /> Live laboratory</a>
-          <a className="nav-item" href="#benchmark"><BarChart3 className="h-4 w-4" /> Benchmark suite</a>
-          <a className="nav-item" href="#telemetry"><Activity className="h-4 w-4" /> Telemetry</a>
-          <button className="nav-item w-full text-left" type="button" onClick={downloadSihPdf}><FileDown className="h-4 w-4" /> Download SIH PDF</button>
-          <button className="nav-item w-full text-left" type="button" onClick={downloadReport}><Download className="h-4 w-4" /> Export JSON report</button>
-          <button className="nav-item w-full text-left" type="button" onClick={downloadCsv}><Download className="h-4 w-4" /> Export CSV metrics</button>
-        </nav>
-        <div className="mt-auto rounded-2xl border border-cyan-100/10 bg-white/[.035] p-4">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-200"><Sparkles className="h-3.5 w-3.5 text-amber-300" /> Deterministic environment</div>
-          <p className="mt-2 text-[11px] leading-5 text-slate-400">Every benchmark records the seed and runtime conditions for repeatable comparisons.</p>
-        </div>
-      </aside>
+      <MissionNav active="simulation" />
 
-      <main className="min-w-0 flex-1 px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
+      <main className="mission-content">
+        <MobileMissionNav active="simulation" />
         <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3 lg:hidden"><div className="grid h-9 w-9 place-items-center rounded-xl bg-cyan-300"><Aperture className="h-4 w-4 text-slate-950" /></div><span className="font-extrabold tracking-[.12em]">PHOTONLOCK</span></div>
           <div className="hidden lg:block"><p className="mono text-[10px] font-medium tracking-[.18em] text-cyan-200/60">EXPERIMENT CONSOLE / 01</p><h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-100">Optical acquisition laboratory</h1></div>
@@ -183,17 +201,21 @@ export default function Home() {
           <div className="space-y-5">
             <div className="glass-panel overflow-hidden rounded-[1.55rem] border border-cyan-100/10 p-3 sm:p-4">
               <div className="mb-3 flex flex-wrap items-center justify-between gap-3 px-1">
-                <div className="flex items-center gap-2"><span className={`h-2 w-2 rounded-full ${snapshot.state === "locked" ? "bg-emerald-300" : snapshot.state === "lost" ? "bg-rose-300" : "bg-amber-300"}`} /><span className="mono text-[10px] font-medium uppercase tracking-[.14em] text-slate-300">State: {snapshot.state.replace("_", " ")}</span></div>
+                <div className={`state-readout state-${stateInfo.tone}`}><span className="h-2 w-2 rounded-full" /><span className="mono text-[10px] font-medium uppercase tracking-[.14em]">{stateInfo.label}</span><span className="hidden text-[10px] text-slate-500 sm:inline">{stateInfo.detail}</span></div>
                 <div className="flex items-center gap-2 text-[10px] text-slate-400"><span className="mono">T+ {snapshot.time.toFixed(1)}s</span><span className="h-3 w-px bg-white/15" /><span className="mono">SEED {config.seed}</span></div>
               </div>
               {cameraSource === "virtual" ? <SimulationViewport snapshot={snapshot} config={config} running={running} /> : <HardwareFeed config={hardwareConfig} armed={adapterArmed} />}
-              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
                 <Metric label="Tracking error" value={`${snapshot.metrics.meanError.toFixed(2)} px`} accent="cyan" />
                 <Metric label="Lock retention" value={`${snapshot.metrics.lockRetention.toFixed(1)}%`} accent="emerald" />
                 <Metric label="Latency" value={`${snapshot.metrics.endToEndLatency.toFixed(0)} ms`} accent="violet" />
                 <Metric label="Confidence" value={`${(snapshot.confidence * 100).toFixed(0)}%`} accent="amber" />
+                <Metric label="Yaw" value={`${snapshot.camera.pan.toFixed(2)}°`} accent="cyan" />
+                <Metric label="Target velocity" value={`${targetVelocity.toFixed(2)} u/s`} accent="amber" />
               </div>
             </div>
+
+            <section className={`state-console ${stateInfo.tone === "rose" ? "state-console-alert" : ""}`}><div className="flex items-center gap-3"><Target className="h-4 w-4" /><div><p className="eyebrow">TRACKING STATE MACHINE</p><p className="mt-1 text-sm font-semibold text-slate-100">{stateInfo.label} <span className="font-normal text-slate-400">· {stateInfo.detail}</span></p></div></div><div className="mono text-[10px] text-slate-400">{snapshot.isOccluded ? "OCCLUSION ACTIVE" : snapshot.prediction ? "PREDICTION ACTIVE" : "FILTER WARM-UP"}</div></section>
 
             <section id="telemetry" className="glass-panel rounded-[1.55rem] border border-cyan-100/10 p-4 sm:p-5">
               <div className="mb-5 flex flex-wrap items-end justify-between gap-3"><div><p className="mono text-[10px] tracking-[.15em] text-slate-500">MEASURED TELEMETRY</p><h2 className="mt-1 text-base font-bold text-slate-100">Pointing and prediction residuals</h2></div><div className="flex items-center gap-3 text-[10px] text-slate-400"><span className="flex items-center gap-1.5"><i className="legend-dot bg-cyan-300" /> CONTROL ERROR</span><span className="flex items-center gap-1.5"><i className="legend-dot bg-violet-400" /> PREDICTION</span></div></div>
@@ -206,28 +228,32 @@ export default function Home() {
           </div>
 
           <aside className="glass-panel rounded-[1.55rem] border border-cyan-100/10 p-4 sm:p-5">
-            <div className="mb-5 flex items-center justify-between"><div><p className="mono text-[10px] tracking-[.15em] text-slate-500">SCENE CONTROLS</p><h2 className="mt-1 text-base font-bold text-slate-100">Experiment configuration</h2></div><Settings2 className="h-4 w-4 text-cyan-200/60" /></div>
+            <div className="mb-5 flex items-center justify-between"><div><p className="mono text-[10px] tracking-[.15em] text-slate-500">MISSION CONFIGURATION</p><h2 className="mt-1 text-base font-bold text-slate-100">Algorithm &amp; disturbances</h2></div><Settings2 className="h-4 w-4 text-cyan-200/60" /></div>
             <div className="mb-5 rounded-xl border border-white/8 bg-black/10 p-1.5"><div className="grid grid-cols-2 gap-1"><ModeButton active={trackingMode === "classical"} onClick={() => updateConfig("mode", "classical")} label="Classical" /><ModeButton active={trackingMode === "predictive"} onClick={() => updateConfig("mode", "predictive")} label="Predictive" /></div></div>
             <div className="mb-5"><p className="control-label"><span>Predictor model</span><span>{config.predictor === "gru" ? "TRAINED GRU" : "KINEMATIC"}</span></p><div className="mt-2 grid grid-cols-2 gap-1 rounded-xl border border-white/8 bg-black/10 p-1.5"><ModeButton active={config.predictor === "kinematic"} onClick={() => updateConfig("predictor", "kinematic")} label="Kinematic" /><ModeButton active={config.predictor === "gru"} onClick={() => updateConfig("predictor", "gru")} label="Trained GRU" /></div><p className="mt-2 text-[10px] leading-4 text-slate-500">{GRU_MODEL_INFO.architecture} · {GRU_MODEL_INFO.sequenceLength} filtered samples · offline artifact {GRU_MODEL_INFO.id}</p></div>
+            <div className="mb-3 flex items-center gap-2 border-t border-white/[.07] pt-4"><Waves className="h-3.5 w-3.5 text-cyan-200" /><p className="mono text-[10px] tracking-[.13em] text-cyan-100/60">DISTURBANCE CONTROL CENTER</p></div>
             <div className="space-y-4">
-              <SliderControl label="Target speed" value={config.targetSpeed} min={0.4} max={2} step={0.05} unit="×" onChange={value => updateConfig("targetSpeed", value)} />
-              <SliderControl label="Visual noise" value={config.noise} min={0} max={1} step={0.02} unit="" onChange={value => updateConfig("noise", value)} />
-              <SliderControl label="Platform vibration" value={config.vibration} min={0} max={1} step={0.02} unit="" onChange={value => updateConfig("vibration", value)} />
-              <SliderControl label="Turbulence" value={config.turbulence} min={0} max={1} step={0.02} unit="" onChange={value => updateConfig("turbulence", value)} />
-              <SliderControl label="Latency" value={config.latencyMs} min={0} max={420} step={5} unit="ms" onChange={value => updateConfig("latencyMs", value)} />
+              <SliderControl label="Target velocity multiplier" value={config.targetSpeed} min={0.4} max={2} step={0.05} unit="×" onChange={value => updateConfig("targetSpeed", value)} />
+              <SliderControl label="Sensor noise · simulated" value={config.noise} min={0} max={1} step={0.02} unit="" onChange={value => updateConfig("noise", value)} />
+              <SliderControl label="Platform vibration · simulated" value={config.vibration} min={0} max={1} step={0.02} unit="" onChange={value => updateConfig("vibration", value)} />
+              <SliderControl label="Atmospheric distortion · simulated" value={config.turbulence} min={0} max={1} step={0.02} unit="" onChange={value => updateConfig("turbulence", value)} />
+              <SliderControl label="System latency" value={config.latencyMs} min={0} max={420} step={5} unit="ms" onChange={value => updateConfig("latencyMs", value)} />
               <SliderControl label="Random seed" value={config.seed} min={1} max={999999} step={1} unit="" onChange={value => updateConfig("seed", Math.round(value))} />
             </div>
-            <div className="mt-6 flex gap-2"><Button variant="outline" className="flex-1 border-white/10 bg-white/[.035] text-slate-200 hover:bg-white/10" onClick={() => resetScene()}><RotateCcw className="mr-2 h-3.5 w-3.5" /> Reset scene</Button><Button variant="outline" className="border-white/10 bg-white/[.035] px-3 text-slate-200 hover:bg-white/10" onClick={() => setConfig(DEFAULT_CONFIG)} aria-label="Restore standard configuration"><History className="h-3.5 w-3.5" /></Button></div>
+            <div className="mt-6 flex gap-2"><Button variant="outline" className="flex-1 border-white/10 bg-white/[.035] text-slate-200 hover:bg-white/10" onClick={() => resetScene()}><TimerReset className="mr-2 h-3.5 w-3.5" /> Apply &amp; restart</Button><Button variant="outline" className="border-white/10 bg-white/[.035] px-3 text-slate-200 hover:bg-white/10" onClick={resetDisturbances} aria-label="Reset supported disturbances"><Waves className="h-3.5 w-3.5" /></Button></div>
+            <div className="mt-4 border-t border-white/[.07] pt-4"><p className="mono text-[10px] tracking-[.13em] text-amber-100/70">LIVE REFERENCE</p><div className="mt-3 grid grid-cols-2 gap-2"><Telemetry label="Target X / Y" value={target ? `${target.screenX.toFixed(2)} / ${target.screenY.toFixed(2)}` : "—"} /><Telemetry label="Target Vx / Vy" value={`${snapshot.targetVelocity.x.toFixed(2)} / ${snapshot.targetVelocity.y.toFixed(2)}`} /><Telemetry label="Yaw / pitch" value={`${snapshot.camera.pan.toFixed(1)}° / ${snapshot.camera.tilt.toFixed(1)}°`} /><Telemetry label="Frame time" value={`${snapshot.metrics.fps ? (1000 / snapshot.metrics.fps).toFixed(1) : "—"} ms`} /></div></div>
           </aside>
         </section>
 
         <section className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_318px]">
           <div className="glass-panel rounded-[1.55rem] border border-cyan-100/10 p-4 sm:p-5">
             <div className="mb-4 flex items-center gap-3"><Layers3 className="h-4 w-4 text-cyan-200" /><div><p className="mono text-[10px] tracking-[.15em] text-slate-500">SCENARIO LIBRARY</p><h2 className="mt-0.5 text-base font-bold text-slate-100">Stress the full tracking loop</h2></div></div>
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">{PRESETS.map(preset => <button key={preset.id} onClick={() => applyPreset(preset.id)} className={`group rounded-xl border p-3 text-left transition-all duration-200 ${activePreset === preset.id ? "border-cyan-200/40 bg-cyan-300/[.09]" : "border-white/[.07] bg-white/[.025] hover:border-cyan-100/20 hover:bg-white/[.055]"}`}><p className="text-xs font-bold text-slate-200">{preset.label}</p><p className="mt-1.5 text-[10px] leading-4 text-slate-500 group-hover:text-slate-400">{preset.description}</p><span className="mt-3 flex items-center text-[10px] font-semibold text-cyan-200/70">Load scenario <ChevronRight className="ml-1 h-3 w-3" /></span></button>)}</div>
+            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">{PRESETS.map((preset, index) => <button key={preset.id} onClick={() => applyPreset(preset.id)} className={`group rounded-xl border p-3 text-left transition-all duration-200 ${activePreset === preset.id ? "border-cyan-200/40 bg-cyan-300/[.09]" : "border-white/[.07] bg-white/[.025] hover:border-cyan-100/20 hover:bg-white/[.055]"}`}><p className="mono text-[9px] tracking-[.12em] text-cyan-100/55">{String(index + 1).padStart(2, "0")}</p><p className="mt-1 text-xs font-bold text-slate-200">{preset.label}</p><p className="mt-1.5 text-[10px] leading-4 text-slate-500 group-hover:text-slate-400">{preset.description}</p><span className="mt-3 flex items-center text-[10px] font-semibold text-cyan-200/70">Load scenario <ChevronRight className="ml-1 h-3 w-3" /></span></button>)}</div>
           </div>
           <div className="glass-panel rounded-[1.55rem] border border-cyan-100/10 p-4 sm:p-5"><div className="flex items-center gap-3"><Gauge className="h-4 w-4 text-violet-300" /><div><p className="mono text-[10px] tracking-[.15em] text-slate-500">CAMERA COMMAND</p><h2 className="mt-0.5 text-base font-bold text-slate-100">Control telemetry</h2></div></div><div className="mt-5 grid grid-cols-2 gap-3"><Telemetry label="Pan angle" value={`${snapshot.camera.pan.toFixed(2)}°`} /><Telemetry label="Tilt angle" value={`${snapshot.camera.tilt.toFixed(2)}°`} /><Telemetry label="Detections" value={snapshot.metrics.detections.toString()} /><Telemetry label="FPS" value={snapshot.metrics.fps.toFixed(1)} /></div></div>
         </section>
+
+        <section className="mt-5 stress-console"><div><div className="flex items-center gap-2"><Zap className="h-4 w-4 text-amber-200" /><p className="eyebrow">GUIDED STRESS TEST</p></div><h2>Configuration-driven resilience sequence</h2><p>Each phase applies a supported simulation configuration and restarts the live virtual environment. It does not fabricate a consolidated result; use the benchmark suite after the sequence for measured comparison.</p></div><div className="stress-actions"><Button className="bg-amber-300 text-slate-950 hover:bg-amber-200" onClick={() => setStressPhase(0)} disabled={stressPhase !== null && stressPhase < STRESS_PROTOCOL.length}><Zap className="mr-2 h-4 w-4" /> {stressPhase === null || stressPhase >= STRESS_PROTOCOL.length ? "Start stress test" : "Stress test running"}</Button>{stressPhase !== null ? <Button variant="outline" className="border-white/10 bg-white/[.03] text-slate-200" onClick={() => setStressPhase(null)}>Abort</Button> : null}</div><div className="stress-timeline">{STRESS_PROTOCOL.map((phase, index) => <div key={phase.label} className={index === stressPhase ? "stress-current" : index < (stressPhase ?? -1) ? "stress-complete" : ""}><span className="mono">{String(index + 1).padStart(2, "0")}</span><strong>{phase.label.replace(/^PHASE \d+ · /, "")}</strong><small>{phase.note}</small></div>)}</div>{stressPhase !== null && stressPhase >= STRESS_PROTOCOL.length ? <p className="mono mt-4 text-[10px] text-emerald-200">SEQUENCE COMPLETE · RUN COMPARISON TO GENERATE A MEASURED BENCHMARK</p> : null}</section>
 
         <section className="mt-5"><HardwareAdapterPanel source={cameraSource} onSourceChange={setCameraSource} onConfigChange={setHardwareConfig} onArmedChange={setAdapterArmed} /></section>
 

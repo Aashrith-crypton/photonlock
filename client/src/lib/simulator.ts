@@ -54,7 +54,8 @@ export type SimulationSnapshot = {
   confidence: number;
   targetVisible: boolean;
   isOccluded: boolean;
-  history: Array<{ time: number; error: number; predictionError: number; confidence: number }>;
+  targetVelocity: { x: number; y: number };
+  history: Array<{ time: number; error: number; predictionError: number; confidence: number; targetScreenX: number; targetScreenY: number; predictionScreenX: number | null; predictionScreenY: number | null }>;
 };
 
 export type BenchmarkResult = {
@@ -442,6 +443,10 @@ export class PhotonSimulation {
         error: controlError,
         predictionError: this.prediction ? distance(target, this.prediction) * 100 : 0,
         confidence: this.confidence * 100,
+        targetScreenX: this.screenPosition(target, false).x,
+        targetScreenY: this.screenPosition(target, false).y,
+        predictionScreenX: this.prediction ? this.screenPosition(this.prediction, false).x : null,
+        predictionScreenY: this.prediction ? this.screenPosition(this.prediction, false).y : null,
       });
       this.history = this.history.slice(-160);
     }
@@ -462,6 +467,8 @@ export class PhotonSimulation {
     const meanError = average(this.errors);
     const rmse = this.errors.length ? Math.sqrt(average(this.errors.map(error => error ** 2))) : 0;
     const stateIsActive = this.state === "locked" || this.state === "acquiring" || this.state === "reacquiring";
+    const priorTarget = this.trajectory(0, Math.max(0, this.time - 0.05));
+    const targetVelocity = { x: (target.x - priorTarget.x) / 0.05, y: (target.y - priorTarget.y) / 0.05 };
     return {
       time: this.time,
       state: this.state,
@@ -485,6 +492,7 @@ export class PhotonSimulation {
       confidence: this.confidence,
       targetVisible: stateIsActive && !this.isOccluded(),
       isOccluded: this.isOccluded(),
+      targetVelocity,
       history: this.history,
     };
   }

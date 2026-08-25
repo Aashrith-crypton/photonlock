@@ -18,3 +18,13 @@
 - [x] Implement a camera/pan-tilt adapter interface with virtual and real-feed modes, connection configuration, command limits, and an emergency-stop control.
 - [x] Add an integration test proving predictive tracking falls back to kinematic extrapolation when trained-model output is unavailable.
 - [x] Re-run final validation and save the delivery checkpoint after closing the model-contract and fallback-test gaps.
+- [x] Implement the attached brief’s concrete mission-control overview, simulation polish, performance lab, technical brief, and experiments archive deliverables.
+- [x] Audit the existing simulation, dashboard, measured telemetry, routes, and state flow before visual productization.
+- [x] Introduce a concise mission-control landing overview with a procedural optical-path hero and direct simulation/performance entry points.
+- [x] Refine the shared aerospace design system, visual hierarchy, status motion, keyboard/focus behavior, and responsive panel structure.
+- [x] Make the live simulation the dominant visual center with clear actual-versus-predicted trajectory treatment, lock-zone context, and measured target/camera telemetry.
+- [x] Add professional numbering to the main simulation scenario selector while preserving the implemented preset configurations.
+- [x] Add a real state-machine and target-loss/reacquisition presentation driven by the existing simulation state.
+- [x] Add a structured stress-test control sequence driven by real scenario configurations without fabricating results.
+- [x] Create a dedicated experiments view that presents authenticated saved runs and routes users to measured benchmarking/report export.
+- [x] Verify desktop, tablet, and compact layouts; preserve all simulation, benchmark, export, and hardware-adapter functionality.

@@ -41,4 +41,13 @@ describe("PhotonSimulation", () => {
     expect(result.predictive.endToEndLatency).toBeGreaterThan(0);
     expect(result.config.seed).toBe(2026);
   });
+
+  it("exposes deterministic target trajectory samples and velocity for scientific visualization", () => {
+    const snapshot = execute({ ...DEFAULT_CONFIG, seed: 4107, trajectory: "accelerating" as const }, 3);
+    const latest = snapshot.history.at(-1);
+    expect(latest?.targetScreenX).toBeGreaterThan(0);
+    expect(latest?.targetScreenY).toBeGreaterThan(0);
+    expect(Number.isFinite(snapshot.targetVelocity.x)).toBe(true);
+    expect(Number.isFinite(snapshot.targetVelocity.y)).toBe(true);
+  });
 });
