@@ -28,3 +28,6 @@
 - [x] Add a structured stress-test control sequence driven by real scenario configurations without fabricating results.
 - [x] Create a dedicated experiments view that presents authenticated saved runs and routes users to measured benchmarking/report export.
 - [x] Verify desktop, tablet, and compact layouts; preserve all simulation, benchmark, export, and hardware-adapter functionality.
+- [x] Review the shared Google Slides template and create a template-aligned Cortex Clash PhotonLock presentation with project-relevant imagery.
+- [x] Generate detailed SIH judge-pitch speaker notes for all six Cortex Clash PhotonLock slides.
+- [ ] Export the latest PhotonLock source and presentation-supporting files to a GitHub repository and verify the remote destination.
